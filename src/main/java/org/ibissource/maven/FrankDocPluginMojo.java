@@ -89,19 +89,24 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		}
 
 		if(includeDeLombokSources) {
+			getLog().info("Property includeDeLombokSources is true, trying to use de-lombok-ed sources");
+			String sourcePathTest = String.format("%ssrc%smain%sjava", File.separator, File.separator, File.separator);
+			getLog().info(String.format("If path ends with [%s], then it is not de-lombok-ed", sourcePathTest));
 			List<String> sources = p.getCompileSourceRoots();
 			List<String> sourcesToUse = new LinkedList<>();
 			for(String sourcePath : sources) {
-				if(sourcePath.endsWith("\\src\\main\\java")) {
-					String delombokPath = sourcePath.replace("\\src\\main\\java", defaultDeLombokPath);
+				if(sourcePath.endsWith(sourcePathTest)) {
+					String delombokPath = sourcePath.replace(sourcePathTest, defaultDeLombokPath);
 					sourcesToUse.add(delombokPath); // We can't add the sources twice, so don't add the default path
+					getLog().info(String.format("Added [%s]", delombokPath));
 				} else {
 					sourcesToUse.add(sourcePath);
+					getLog().info(String.format("Added [%s]", sourcePath));
 				}
 			}
 			return sourcesToUse;
 		}
-
+		getLog().info("Property includeDeLombokSources is false, returning compile source roots");
 		return new LinkedList<>(p.getCompileSourceRoots());
 	}
 
