@@ -44,7 +44,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	private boolean includeDeLombokSources = true;
 
 	@Parameter(property = "delombokSourcePath")
-	private String defaultDeLombokPath = "\\target\\generated-sources\\delombok";
+	private String defaultDeLombokPath = String.format("%starget%sgenerated-sources%sdelombok", File.separator, File.separator, File.separator);
 
 	@Parameter(property = "reactorProjects", readonly = true)
 	private List<MavenProject> subModules;
