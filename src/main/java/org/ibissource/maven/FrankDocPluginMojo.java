@@ -44,7 +44,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	private boolean includeDeLombokSources = true;
 
 	@Parameter(property = "delombokSourcePath")
-	private String defaultDeLombokPath = "\\target\\generated-sources\\delombok";
+	private String defaultDeLombokPath = String.format("%starget%sgenerated-sources%sdelombok", File.separator, File.separator, File.separator);
 
 	@Parameter(property = "reactorProjects", readonly = true)
 	private List<MavenProject> subModules;
@@ -54,6 +54,10 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 
 	@Override
 	public void doExecute() throws MojoExecutionException {
+		if(includeDeLombokSources) {
+			getLog().info("Property includeDeLombokSources is true, will try to use de-lombok-ed sources");
+		}
+
 		super.doExecute();
 
 		List<Artifact> artifacts = project.getAttachedArtifacts();
@@ -89,9 +93,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		}
 
 		if(includeDeLombokSources) {
-			getLog().info("Property includeDeLombokSources is true, trying to use de-lombok-ed sources");
 			String sourcePathTest = String.format("%ssrc%smain%sjava", File.separator, File.separator, File.separator);
-			getLog().info(String.format("If path ends with [%s], then it is not de-lombok-ed", sourcePathTest));
 			List<String> sources = p.getCompileSourceRoots();
 			List<String> sourcesToUse = new LinkedList<>();
 			for(String sourcePath : sources) {
@@ -106,7 +108,6 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 			}
 			return sourcesToUse;
 		}
-		getLog().info("Property includeDeLombokSources is false, returning compile source roots");
 		return new LinkedList<>(p.getCompileSourceRoots());
 	}
 
