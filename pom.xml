@@ -217,30 +217,7 @@
 
 	<profiles>
 		<profile>
-			<id>ibissource</id>
-			<distributionManagement>
-				<repository>
-					<id>ibissource</id>
-					<url>https://nexus.ibissource.org/content/repositories/releases</url>
-				</repository>
-				<snapshotRepository>
-					<id>ibissource</id>
-					<url>https://nexus.ibissource.org/content/repositories/snapshots</url>
-				</snapshotRepository>
-				<site>
-					<id>www.ibissource.org</id>
-					<url>file:target/site-deploy</url>
-				</site>
-			</distributionManagement>
-			<repositories>
-				<repository>
-					<id>ibissource</id>
-					<url>https://nexus.ibissource.org/content/groups/public</url>
-				</repository>
-			</repositories>
-		</profile>
-		<profile>
-			<id>ossrh</id>
+			<id>release</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -280,6 +257,32 @@
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<id>ibissource</id>
+			<distributionManagement>
+				<repository>
+					<id>ibissource</id>
+					<url>https://nexus.ibissource.org/content/repositories/releases</url>
+				</repository>
+				<snapshotRepository>
+					<id>ibissource</id>
+					<url>https://nexus.ibissource.org/content/repositories/snapshots</url>
+				</snapshotRepository>
+				<site>
+					<id>www.ibissource.org</id>
+					<url>file:target/site-deploy</url>
+				</site>
+			</distributionManagement>
+			<repositories>
+				<repository>
+					<id>ibissource</id>
+					<url>https://nexus.ibissource.org/content/groups/public</url>
+				</repository>
+			</repositories>
+		</profile>
+		<profile>
+			<id>ossrh</id>
 			<distributionManagement>
 				<repository>
 					<id>ossrh</id>
