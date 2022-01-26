@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 WeAreFrank!
+   Copyright 2021-2022 WeAreFrank!
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.apache.maven.reporting.MavenReportException;
 
 @Mojo(name = "aggregate-jar", defaultPhase = LifecyclePhase.PROCESS_SOURCES, aggregator = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class FrankDocPluginMojo extends AggregatorJavadocJar {
+	public static final String DEFAULT_SOURCE_PATH = String.format("%ssrc%smain%sjava", File.separator, File.separator, File.separator);
 
 	@Component
 	private ProjectDependenciesResolver projectDependenciesResolver;
@@ -93,7 +94,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		}
 
 		if(includeDeLombokSources) {
-			String sourcePathTest = String.format("%ssrc%smain%sjava", File.separator, File.separator, File.separator);
+			String sourcePathTest = DEFAULT_SOURCE_PATH;
 			List<String> sources = p.getCompileSourceRoots();
 			List<String> sourcesToUse = new LinkedList<>();
 			for(String sourcePath : sources) {
@@ -106,8 +107,10 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 					getLog().info(String.format("Added [%s]", sourcePath));
 				}
 			}
+
 			return sourcesToUse;
 		}
+
 		return new LinkedList<>(p.getCompileSourceRoots());
 	}
 
