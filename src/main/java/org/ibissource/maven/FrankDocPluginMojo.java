@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Resource;
@@ -33,13 +32,19 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.plugins.javadoc.AggregatorJavadocJar;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.MavenReportException;
+import org.codehaus.plexus.archiver.ArchiverException;
+import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
 @Mojo(name = "aggregate-jar", defaultPhase = LifecyclePhase.PROCESS_SOURCES, aggregator = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	public static final String DEFAULT_SOURCE_PATH = String.format("%ssrc%smain%sjava", File.separator, File.separator, File.separator);
+	private static final String FRANK_CONFIG_COMPATIBILITY = "FrankConfig-compatibility.xsd";
 
 	@Component
-	private ProjectDependenciesResolver projectDependenciesResolver;
+	private ArchiverManager archiverManager;
 
 	@Parameter(property = "includeDeLombokSources")
 	private boolean includeDeLombokSources = true;
@@ -53,10 +58,17 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	@Parameter(property = "appendTo")
 	private String appendTo;
 
+	@Parameter
+	private FrontendArtifact frontendArtifact;
+
 	@Override
 	public void doExecute() throws MojoExecutionException {
 		if(includeDeLombokSources) {
 			getLog().info("Property includeDeLombokSources is true, will try to use de-lombok-ed sources");
+		}
+
+		if(frontendArtifact != null) {
+			locateAndExtractFrontend();
 		}
 
 		super.doExecute();
@@ -69,6 +81,48 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		}
 	}
 
+	private void locateAndExtractFrontend() throws MojoExecutionException {
+		try {
+			Artifact frontend = resolveDependency(frontendArtifact);
+			File frontendLocation = frontend.getFile();
+			getLog().info( "Found Frank!Doc frontend artifact ["+frontendLocation+"]" );
+
+			File destDirectory = new File(getOutputDirectory());
+			getLog().info("dest: " + destDirectory.toString());
+			destDirectory.mkdirs();
+			unarchive(frontendLocation, destDirectory);
+
+		} catch (MavenReportException e) {
+			throw new MojoExecutionException("unable to locate frontend artifact", e);
+		}
+	}
+
+	private void unarchive(File artifactLocation, File toDirectory) throws MavenReportException {
+		UnArchiver unArchiver;
+		try {
+			unArchiver = archiverManager.getUnArchiver("jar");
+		} catch (NoSuchArchiverException e) {
+			throw new MavenReportException("Unable to extract resources artifact. " + "No archiver for 'jar' available.", e);
+		}
+
+		unArchiver.setSourceFile(artifactLocation);
+		if(toDirectory == null || !toDirectory.exists() || !toDirectory.isDirectory()) {
+			throw new MavenReportException("frankdoc [outputDirectory] does not exist!");
+		}
+		unArchiver.setDestDirectory(toDirectory);
+		// remove the META-INF directory from resource artifact
+		IncludeExcludeFileSelector[] selectors = new IncludeExcludeFileSelector[] { new IncludeExcludeFileSelector() };
+		selectors[0].setExcludes(new String[] { "META-INF/**" });
+		unArchiver.setFileSelectors(selectors);
+
+		getLog().info("Extracting contents of resources artifact: " + artifactLocation);
+		try {
+			unArchiver.extract();
+		} catch (ArchiverException e) {
+			throw new MavenReportException("Extraction of archive resources failed.", e);
+		}
+	}
+
 	private void addAttachedArtifact(Artifact artifact) {
 		if(appendTo == null) {
 			return;
@@ -77,14 +131,31 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		for (MavenProject reactorProject : this.subModules ) {
 			if(appendTo.equals(reactorProject.getArtifactId())) {
 				File frankdoc = artifact.getFile();
-				getLog().info( "Found frankdoc artifact ["+frankdoc+"]" );
-				Resource resource = new Resource();
-				resource.setDirectory(getOutputDirectory());
-				reactorProject.addResource(resource);
+				getLog().info( "Found Frank!Doc doclet artifact ["+frankdoc+"]" );
+
+				reactorProject.addResource(createFrontendResources());
+				reactorProject.addResource(createCompatibilityResource());
 				reactorProject.addAttachedArtifact(artifact);
+
 				break;
 			}
 		}
+	}
+
+	private Resource createCompatibilityResource() {
+		Resource resource = new Resource();
+		resource.setDirectory(getOutputDirectory());
+		resource.addInclude(FRANK_CONFIG_COMPATIBILITY);
+		resource.setTargetPath("xml/xsd");
+		return resource;
+	}
+
+	private Resource createFrontendResources() {
+		Resource resource = new Resource();
+		resource.setDirectory(getOutputDirectory());
+		resource.addExclude(FRANK_CONFIG_COMPATIBILITY);
+		resource.setTargetPath("META-INF/resources/iaf/frankdoc");
+		return resource;
 	}
 
 	@Override
