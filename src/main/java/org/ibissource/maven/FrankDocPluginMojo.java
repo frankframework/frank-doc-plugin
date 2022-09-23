@@ -58,7 +58,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	@Parameter(property = "appendTo")
 	private String appendTo;
 
-	@Parameter
+	@Parameter(property = "frontendArtifact")
 	private FrontendArtifact frontendArtifact;
 
 	@Override
