@@ -41,7 +41,10 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
 @Mojo(name = "aggregate-jar", defaultPhase = LifecyclePhase.PROCESS_SOURCES, aggregator = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	public static final String DEFAULT_SOURCE_PATH = String.format("%ssrc%smain%sjava", File.separator, File.separator, File.separator);
-	private static final String FRANK_CONFIG_COMPATIBILITY = "FrankConfig-compatibility.xsd";
+	private static final String FRANK_CONFIG_COMPATIBILITY = "xml/xsd/FrankConfig-compatibility.xsd";
+	private static final String FRANK_CONFIG_STRICT = "xml/xsd/FrankConfig.xsd";
+	private static final String FRANK_CONFIG_JSON = "js/frankdoc.json";
+	private static final String FRANK_CONFIG_SUMMARY = "txt/elementSummary.txt";
 
 	@Component
 	private ArchiverManager archiverManager;
@@ -146,7 +149,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		Resource resource = new Resource();
 		resource.setDirectory(getOutputDirectory());
 		resource.addInclude(FRANK_CONFIG_COMPATIBILITY);
-		resource.setTargetPath("xml/xsd");
+		resource.addInclude(FRANK_CONFIG_STRICT);
 		return resource;
 	}
 
@@ -154,6 +157,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		Resource resource = new Resource();
 		resource.setDirectory(getOutputDirectory());
 		resource.addExclude(FRANK_CONFIG_COMPATIBILITY);
+		resource.addExclude(FRANK_CONFIG_SUMMARY);
 		resource.setTargetPath("META-INF/resources/iaf/frankdoc");
 		return resource;
 	}
