@@ -79,7 +79,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		List<Artifact> artifacts = project.getAttachedArtifacts();
 		for(Artifact artifact : artifacts) {
 			if(getClassifier().equals(artifact.getClassifier()) && project.getArtifact().getVersion().equals(artifact.getVersion())) {
-				addAttachedArtifact(artifact); //We found the Frank!Doc artifact
+				addAttachedArtifact(artifact); // We found the Frank!Doc artifact
 			}
 		}
 	}
@@ -88,15 +88,15 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		try {
 			Artifact frontend = resolveDependency(frontendArtifact);
 			File frontendLocation = frontend.getFile();
-			getLog().info( "Found Frank!Doc frontend artifact ["+frontendLocation+"]" );
+			getLog().info("Found Frank!Doc frontend artifact [" + frontendLocation + "]");
 
 			File destDirectory = new File(getOutputDirectory());
-			getLog().info("dest: " + destDirectory.toString());
+			getLog().info("Frank!Doc frontend will be unarchived at [" + destDirectory + "]");
 			destDirectory.mkdirs();
 			unarchive(frontendLocation, destDirectory);
 
-		} catch (MavenReportException e) {
-			throw new MojoExecutionException("unable to locate frontend artifact", e);
+		} catch(MavenReportException e) {
+			throw new MojoExecutionException("Unable to locate Frank!Doc frontend artifact.", e);
 		}
 	}
 
@@ -104,24 +104,24 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		UnArchiver unArchiver;
 		try {
 			unArchiver = archiverManager.getUnArchiver("jar");
-		} catch (NoSuchArchiverException e) {
-			throw new MavenReportException("Unable to extract resources artifact. " + "No archiver for 'jar' available.", e);
+		} catch(NoSuchArchiverException e) {
+			throw new MavenReportException("Unable to extract resources artifact. No archiver for 'jar' available.", e);
 		}
 
 		unArchiver.setSourceFile(artifactLocation);
 		if(toDirectory == null || !toDirectory.exists() || !toDirectory.isDirectory()) {
-			throw new MavenReportException("frankdoc [outputDirectory] does not exist!");
+			throw new MavenReportException("Frank!Doc [outputDirectory] does not exist!");
 		}
 		unArchiver.setDestDirectory(toDirectory);
-		// remove the META-INF directory from resource artifact
-		IncludeExcludeFileSelector[] selectors = new IncludeExcludeFileSelector[] { new IncludeExcludeFileSelector() };
-		selectors[0].setExcludes(new String[] { "META-INF/**" });
+		// Remove the META-INF directory from resource artifact
+		IncludeExcludeFileSelector[] selectors = new IncludeExcludeFileSelector[]{new IncludeExcludeFileSelector()};
+		selectors[0].setExcludes(new String[]{"META-INF/**"});
 		unArchiver.setFileSelectors(selectors);
 
 		getLog().info("Extracting contents of resources artifact: " + artifactLocation);
 		try {
 			unArchiver.extract();
-		} catch (ArchiverException e) {
+		} catch(ArchiverException e) {
 			throw new MavenReportException("Extraction of archive resources failed.", e);
 		}
 	}
@@ -131,10 +131,10 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 			return;
 		}
 
-		for (MavenProject reactorProject : this.subModules ) {
+		for(MavenProject reactorProject : this.subModules) {
 			if(appendTo.equals(reactorProject.getArtifactId())) {
 				File frankdoc = artifact.getFile();
-				getLog().info( "Found Frank!Doc doclet artifact ["+frankdoc+"]" );
+				getLog().info("Found Frank!Doc artifact [" + frankdoc + "]");
 
 				reactorProject.addResource(createFrontendResources());
 				reactorProject.addResource(createCompatibilityResource());
@@ -176,10 +176,10 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 				if(sourcePath.endsWith(sourcePathTest)) {
 					String delombokPath = sourcePath.replace(sourcePathTest, defaultDeLombokPath);
 					sourcesToUse.add(delombokPath); // We can't add the sources twice, so don't add the default path
-					getLog().info(String.format("Added [%s]", delombokPath));
+					getLog().info("Added [" + delombokPath + "]");
 				} else {
 					sourcesToUse.add(sourcePath);
-					getLog().info(String.format("Added [%s]", sourcePath));
+					getLog().info("Added [" + sourcePath + "]");
 				}
 			}
 
@@ -191,7 +191,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 
 	@Override
 	public Artifact resolveDependency(Dependency dependency) throws MavenReportException {
-		for (MavenProject reactorProject : this.subModules ) {
+		for(MavenProject reactorProject : this.subModules) {
 			if(dependency.getArtifactId().equals(reactorProject.getArtifactId()) && dependency.getGroupId().equals(reactorProject.getGroupId())) {
 				return reactorProject.getArtifact();
 			}
