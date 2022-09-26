@@ -150,6 +150,8 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		resource.setDirectory(getOutputDirectory());
 		resource.addInclude(FRANK_CONFIG_COMPATIBILITY);
 		resource.addInclude(FRANK_CONFIG_STRICT);
+		resource.addExclude(FRANK_CONFIG_SUMMARY);
+		resource.setFiltering(false);
 		return resource;
 	}
 
@@ -159,6 +161,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		resource.addExclude(FRANK_CONFIG_COMPATIBILITY);
 		resource.addExclude(FRANK_CONFIG_SUMMARY);
 		resource.setTargetPath("META-INF/resources/iaf/frankdoc");
+		resource.setFiltering(false);
 		return resource;
 	}
 
