@@ -3,7 +3,7 @@
 
 	<groupId>org.ibissource</groupId>
 	<artifactId>frank-doc-plugin</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.2</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Maven Frank!Doc Plugin</name>
@@ -40,7 +40,7 @@
 		<url>https://github.com/ibissource/frank-doc-plugin</url>
 		<developerConnection>scm:git:https://github.com/ibissource/frank-doc-plugin.git</developerConnection>
 		<connection>scm:git:https://github.com/ibissource/frank-doc-plugin.git</connection>
-		<tag>HEAD</tag>
+		<tag>v0.2</tag>
 	</scm>
 
 	<dependencies>
