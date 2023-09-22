@@ -38,7 +38,13 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
-@Mojo(name = "aggregate-jar", defaultPhase = LifecyclePhase.PROCESS_SOURCES, aggregator = true, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(
+	name = "aggregate-jar",
+	defaultPhase = LifecyclePhase.PROCESS_SOURCES,
+	aggregator = true,
+	threadSafe = true,
+	requiresDependencyResolution = ResolutionScope.COMPILE
+)
 public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	public static final String DEFAULT_SOURCE_PATH = String.format("%ssrc%smain%sjava", File.separator, File.separator, File.separator);
 	private static final String FRANK_CONFIG_COMPATIBILITY = "xml/xsd/FrankConfig-compatibility.xsd";
