@@ -107,6 +107,7 @@
 	</dependencies>
 
 	<build>
+		<defaultGoal>verify</defaultGoal>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -115,7 +116,7 @@
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-component-metadata</artifactId>
-				<version>1.7.1</version>
+				<version>2.1.1</version>
 				<executions>
 					<execution>
 						<goals>
