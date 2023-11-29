@@ -1,4 +1,4 @@
-package org.ibissource.maven;
+package org.frankframework.maven;
 
 import org.apache.maven.model.Dependency;
 
