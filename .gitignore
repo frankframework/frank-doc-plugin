@@ -1,3 +1,5 @@
 /target/
 frank-doc-plugin.iml
 .idea/
+/bin/
+.classpath
