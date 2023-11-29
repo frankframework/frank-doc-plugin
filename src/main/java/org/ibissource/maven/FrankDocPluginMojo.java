@@ -25,6 +25,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -45,6 +46,7 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
 	threadSafe = true,
 	requiresDependencyResolution = ResolutionScope.COMPILE
 )
+@Execute(phase = LifecyclePhase.COMPILE)
 public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	public static final String DEFAULT_SOURCE_PATH = String.format("%ssrc%smain%sjava", File.separator, File.separator, File.separator);
 	private static final String FRANK_CONFIG_COMPATIBILITY = "xml/xsd/FrankConfig-compatibility.xsd";
@@ -201,7 +203,11 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 	@Override
 	public Artifact resolveDependency(Dependency dependency) throws MavenReportException {
 		for(MavenProject reactorProject : this.subModules) {
-			if(dependency.getArtifactId().equals(reactorProject.getArtifactId()) && dependency.getGroupId().equals(reactorProject.getGroupId())) {
+			String subModuleArtifactId = reactorProject.getArtifactId();
+			String subModuleGroupId = reactorProject.getGroupId();
+			String dependencyArtifactId = dependency.getArtifactId();
+			String dependencyGroupId = dependency.getGroupId();
+			if(subModuleArtifactId.equals(dependencyArtifactId) && subModuleGroupId.equals(dependencyGroupId)) {
 				return reactorProject.getArtifact();
 			}
 		}
