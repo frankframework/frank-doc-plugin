@@ -1,5 +1,5 @@
 /*
-   Copyright 2021-2023 WeAreFrank!
+   Copyright 2021-2025 WeAreFrank!
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		List<Artifact> artifacts = project.getAttachedArtifacts();
 		for(Artifact artifact : artifacts) {
 			if(getClassifier().equals(artifact.getClassifier()) && project.getArtifact().getVersion().equals(artifact.getVersion())) {
-				addAttachedArtifact(artifact); // We found the Frank!Doc artifact
+				addFrankDocResourcesToArtifact(artifact); // We found the Frank!Doc artifact
 			}
 		}
 	}
@@ -134,7 +134,11 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		}
 	}
 
-	private void addAttachedArtifact(Artifact artifact) {
+	/**
+	 * Add the frontend resources and the Frank!Doc XSDs and the element summary to the submodule that matches the appendTo parameter.
+	 * By default this is the core-module.
+	 */
+	private void addFrankDocResourcesToArtifact(Artifact artifact) {
 		if(appendTo == null) {
 			return;
 		}
@@ -144,16 +148,15 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 				File frankdoc = artifact.getFile();
 				getLog().info("Found Frank!Doc artifact [" + frankdoc + "]");
 
-				reactorProject.addResource(createFrontendResources());
-				reactorProject.addResource(createCompatibilityResource());
-				reactorProject.addAttachedArtifact(artifact);
+				reactorProject.addResource(createXsdsResource());
+				reactorProject.addResource(createStaticFrontendResources());
 
 				break;
 			}
 		}
 	}
 
-	private Resource createCompatibilityResource() {
+	private Resource createXsdsResource() {
 		Resource resource = new Resource();
 		resource.setDirectory(getOutputDirectory());
 		resource.addInclude(FRANK_CONFIG_COMPATIBILITY);
@@ -163,7 +166,7 @@ public class FrankDocPluginMojo extends AggregatorJavadocJar {
 		return resource;
 	}
 
-	private Resource createFrontendResources() {
+	private Resource createStaticFrontendResources() {
 		Resource resource = new Resource();
 		resource.setDirectory(getOutputDirectory());
 		resource.addExclude(FRANK_CONFIG_COMPATIBILITY);
